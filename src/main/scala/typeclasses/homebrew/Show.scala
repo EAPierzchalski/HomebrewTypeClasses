@@ -1,4 +1,4 @@
-package com.tomorrowlandenterprises.experimental.shapeless.typeclasses.homebrew
+package typeclasses.homebrew
 
 /**
  * Created by eap on 7/31/14.

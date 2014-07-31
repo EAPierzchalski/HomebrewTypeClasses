@@ -1,4 +1,4 @@
-package com.tomorrowlandenterprises.experimental.shapeless.typeclasses.homebrew
+package typeclasses.homebrew
 
 import shapeless._
 import shapeless.record._
