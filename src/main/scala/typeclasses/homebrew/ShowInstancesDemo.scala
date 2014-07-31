@@ -5,7 +5,7 @@ import shapeless._
 /**
  * Created by eap on 7/31/14.
  */
-object ProductShowDemo {
+object ShowInstancesDemo {
   sealed trait T
   case class A(n: Int) extends T
   case class B(wop: String, n: Int) extends T
