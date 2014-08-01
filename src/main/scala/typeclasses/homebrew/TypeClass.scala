@@ -11,8 +11,8 @@ trait TypeClass[C[_]] {
   def emptyProduct: C[HNil]
   def productInstance[H, T <: HList](
     name: String,
-    CH: => C[H],
-    CT: => C[T]): C[H :: T]
+    CH: C[H],
+    CT: C[T]): C[H :: T]
   def emptyCoproduct: C[CNil]
   def coproductInstance[L, R <: Coproduct](
     name: String,
@@ -39,16 +39,16 @@ trait TypeClass[C[_]] {
     }
 
   implicit def productCase[Label <: Symbol, Head, Tail <: HList, TailOut <: HList](
-    implicit witnessLabel: Witness.Aux[Label],
-    headInstance: C[Head],
-    tailInstance: Aux[Tail, TailOut]): Aux[FieldType[Label, Head] :: Tail, Head :: TailOut] =
+    implicit witnessLabel: Lazy[Witness.Aux[Label]],
+    headInstance: Lazy[C[Head]],
+    tailInstance: Lazy[Aux[Tail, TailOut]]): Aux[FieldType[Label, Head] :: Tail, Head :: TailOut] =
     new InstanceFor[FieldType[Label, Head]:: Tail] {
       type Inner = Head :: TailOut
       override def apply(): Out =
         productInstance(
-          name = witnessLabel.value.name,
-          CH = headInstance,
-          CT = tailInstance()
+          name = witnessLabel.value.value.name,
+          CH = headInstance.value,
+          CT = tailInstance.value()
         )
     }
 
@@ -59,34 +59,34 @@ trait TypeClass[C[_]] {
     }
 
   implicit def coproductCase[Label <: Symbol, Left, Right <: Coproduct, TailOut <: Coproduct](
-    implicit witnessLabel: Witness.Aux[Label],
-    headInstance: C[Left],
-    tailInstance: Aux[Right, TailOut]): Aux[FieldType[Label, Left] :+: Right, Left :+: TailOut] =
+    implicit witnessLabel: Lazy[Witness.Aux[Label]],
+    headInstance: Lazy[C[Left]],
+    tailInstance: Lazy[Aux[Right, TailOut]]): Aux[FieldType[Label, Left] :+: Right, Left :+: TailOut] =
     new InstanceFor[FieldType[Label, Left]:+: Right] {
       type Inner = Left :+: TailOut
       override def apply(): Out =
         coproductInstance(
-          name = witnessLabel.value.name,
-          CL = headInstance,
-          CR = tailInstance()
+          name = witnessLabel.value.value.name,
+          CL = headInstance.value,
+          CR = tailInstance.value()
         )
     }
 
   implicit def genericCase[A, LabelledRep, StrippedRep](
-    implicit labelledGenA: LabelledGeneric[A] { type Repr = LabelledRep },
-    bareGenA: Generic[A] { type Repr = StrippedRep },
-    labelledInstance: InstanceFor[LabelledRep] { type Inner = StrippedRep }): InstanceFor[A] { type Inner = A } =
+    implicit labelledGenA: LabelledGeneric.Aux[A, LabelledRep],
+    bareGenA: Generic.Aux[A, StrippedRep],
+    labelledInstance: Lazy[Aux[LabelledRep, StrippedRep]]): Aux[A, A] =
     new InstanceFor[A] {
       type Inner = A
       override def apply(): Out = project[A, StrippedRep](
-        instance = labelledInstance(),
+        instance = labelledInstance.value(),
         to = bareGenA.to,
         from = bareGenA.from
       )
     }
 
   object auto {
-    implicit def derive[A](implicit instance: InstanceFor[A] { type Inner = A }): C[A] = instance()
+    implicit def derive[A](implicit instance: Aux[A, A]): C[A] = instance()
   }
 
   def apply[A](implicit instance: InstanceFor[A] { type Inner = A }) = instance()

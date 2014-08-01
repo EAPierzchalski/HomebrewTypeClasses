@@ -18,8 +18,8 @@ object ShowInstances extends TypeClass[Show] {
 
   override def productInstance[H, T <: HList](
     name: String,
-    CH: => Show[H],
-    CT: => Show[T]): Show[::[H, T]] =
+    CH: Show[H],
+    CT: Show[T]): Show[::[H, T]] =
     Show {
       case head :: tail =>
         val hs = CH.show(head)
