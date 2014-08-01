@@ -4,8 +4,9 @@ import sbt.Keys._
 object TypeClassesBuild extends Build {
 
   val baseDependencies = Seq(
-    "com.chuusai" %% "shapeless" % "2.0.0",
-    "org.scala-lang" % "scala-library" % "2.11.2"
+    "com.chuusai" %% "shapeless" % "2.1.0-SNAPSHOT",
+    "org.scala-lang" % "scala-library" % "2.11.2",
+    "org.scala-lang" % "scala-reflect" % "2.11.2"
   )
 
   val baseResolvers = Seq(
