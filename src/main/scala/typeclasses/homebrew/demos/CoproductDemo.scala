@@ -15,8 +15,10 @@ case class C(d: Double) extends TT
 object CoproductDemo {
   def main(args: Array[String]) {
     import Show._
+    import ShowInstances._
     import ShowInstances.auto._
+    import typeclasses.generics.GenericImplicits._
     //reaches within tuples to find show instances
-    println(((B("magic", 12), A(14)): (Trait, Trait)).show)
+    //println(((B("magic", 12), A(14)): (Trait, Trait)).show)
   }
 }
