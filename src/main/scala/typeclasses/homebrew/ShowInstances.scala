@@ -16,7 +16,7 @@ object ShowInstances extends TypeClass[Show] {
     from: (B) => A): Show[A] =
     Show { a => instance.show(to(a)) }
 
-  override def productInstance[H, T <: HList](
+  override def product[H, T <: HList](
     name: String,
     CH: Show[H],
     CT: Show[T]): Show[::[H, T]] =
@@ -31,7 +31,7 @@ object ShowInstances extends TypeClass[Show] {
   override def emptyCoproduct: Show[CNil] =
     Show { _ => throw new Exception("Should never call instance for CNil") }
 
-  override def coproductInstance[L, R <: Coproduct](
+  override def coproduct[L, R <: Coproduct](
     name: String,
     CL: => Show[L],
     CR: => Show[R]): Show[:+:[L, R]] = Show {

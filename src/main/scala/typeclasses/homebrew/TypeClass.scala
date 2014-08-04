@@ -9,12 +9,12 @@ import shapeless.record._
 
 trait TypeClass[C[_]] {
   def emptyProduct: C[HNil]
-  def productInstance[H, T <: HList](
+  def product[H, T <: HList](
     name: String,
-    CH: C[H],
-    CT: C[T]): C[H :: T]
+    CHead: C[H],
+    CTail: C[T]): C[H :: T]
   def emptyCoproduct: C[CNil]
-  def coproductInstance[L, R <: Coproduct](
+  def coproduct[L, R <: Coproduct](
     name: String,
     CL: => C[L],
     CR: => C[R]): C[L :+: R]
@@ -44,10 +44,10 @@ trait TypeClass[C[_]] {
     new InstanceFor[FieldType[Label, Head]:: Tail] {
       type Out = C[Head :: TailOut]
       override def apply(): Out =
-        productInstance(
+        product(
           name = witnessLabel.value.value.name,
-          CH = headInstance.value,
-          CT = tailInstance.value()
+          CHead = headInstance.value,
+          CTail = tailInstance.value()
         )
     }
 
@@ -64,7 +64,7 @@ trait TypeClass[C[_]] {
     new InstanceFor[FieldType[Label, Left]:+: Right] {
       type Out = C[Left :+: TailOut]
       override def apply(): Out =
-        coproductInstance(
+        coproduct(
           name = witnessLabel.value.value.name,
           CL = headInstance.value,
           CR = tailInstance.value()
