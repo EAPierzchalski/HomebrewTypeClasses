@@ -20,13 +20,16 @@ object InjectionDemo {
 
   def main(args: Array[String]) {
     import Show._
-    //import ShowInstances.auto._
+    import shapeless._
+    import ShowInstances._
     import typeclasses.generics.lazyImplicits._
     import Inject._
     //successfully uses injected instances, but only after import.
     //this could be made more elegant by refactoring some of the
     //typeclass code into a hierarchy with a final instantiation step
     //where custom instances could be injected.
-    //println((CaseA(12): Inject).show)
+    implicit val showInject = implicitly[Lazy[Show[Inject]]].value
+    println((CaseA(12): Inject).show)
+    println(CaseA(19).show)
   }
 }

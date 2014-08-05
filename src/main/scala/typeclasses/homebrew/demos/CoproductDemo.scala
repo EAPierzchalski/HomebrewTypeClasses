@@ -18,13 +18,8 @@ object CoproductDemo {
     import shapeless._
     import Show._
     import ShowInstances._
-    //reaches within tuples to find show instances
-
-    //val lga = LabelledGeneric[C]
-    //val bga = Generic[C]
-    //ShowInstances.genericProductRipper[C, lga.Repr, bga.Repr]
     implicit val magic = implicitly[Lazy[Show[Trait]]].value
     println((B("magi", B("12", C(2.2))): Trait).show)
-    //println(((B("magic", 12), A(14)): (Trait, Trait)).show)
+    println(((B("magic", C(3.15)), A(14)): (Trait, Trait)).show)
   }
 }
