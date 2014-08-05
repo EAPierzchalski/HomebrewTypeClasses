@@ -15,7 +15,7 @@ case class Outside(s: String, t: Inner) extends Outer
 object NestingDemo {
   def main(args: Array[String]) {
     import Show._
-    import ShowInstances.auto._
+    //import ShowInstances.auto._
     //fails to handle nested instances: another divering instance issue.
     //println((Outside("hello", Inside(12)): Outer).show)
   }

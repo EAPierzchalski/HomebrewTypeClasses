@@ -13,7 +13,7 @@ case class RCons(s: String, rest: Rec) extends Rec
 object RecursionDemo {
   def main(args: Array[String]) {
     import Show._
-    import ShowInstances.auto._
+    //import ShowInstances.auto._
     //fails to handle recursive types: 'diverging implicit expansion'.
     //presumably using Lazy[_] will help, but whatever I tried wasn't very
     //successful.
