@@ -7,10 +7,10 @@ import typeclasses.homebrew.{ ShowInstances, Show }
  */
 
 object CoproductDemo {
-  sealed trait T
-  case class A(n: Int) extends T
-  case class B(s: String, t: T) extends T
-  sealed trait TT extends T
+  sealed trait Trait
+  case class A(n: Int) extends Trait
+  case class B(s: String, t: Trait) extends Trait
+  sealed trait TT extends Trait
   case class C(d: Double) extends TT
 
   def main(args: Array[String]) {
@@ -23,8 +23,8 @@ object CoproductDemo {
     //val lga = LabelledGeneric[C]
     //val bga = Generic[C]
     //ShowInstances.genericProductRipper[C, lga.Repr, bga.Repr]
-    implicitly[Show[C]]
-    //println(B("magi", 12).show)
+    implicit val magic = implicitly[Lazy[Show[Trait]]].value
+    println((B("magi", B("12", C(2.2))): Trait).show)
     //println(((B("magic", 12), A(14)): (Trait, Trait)).show)
   }
 }
