@@ -18,7 +18,7 @@ object CoproductDemo {
     import shapeless._
     import Show._
     import ShowInstances._
-    implicit val magic = implicitly[Lazy[Show[Trait]]].value
+    implicit val showTrait = implicitly[Lazy[Show[Trait]]].value
     println((B("magi", B("12", C(2.2))): Trait).show)
     println(((B("magic", C(3.15)), A(14)): (Trait, Trait)).show)
   }
