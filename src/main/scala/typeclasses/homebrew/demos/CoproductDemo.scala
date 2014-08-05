@@ -21,5 +21,6 @@ object CoproductDemo {
     implicit val showTrait = implicitly[Lazy[Show[Trait]]].value
     println((B("magi", B("12", C(2.2))): Trait).show)
     println(((B("magic", C(3.15)), A(14)): (Trait, Trait)).show)
+    println(Seq[Trait](A(12), C(3.14)).show)
   }
 }

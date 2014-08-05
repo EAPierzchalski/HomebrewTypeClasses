@@ -15,6 +15,9 @@ object Show {
   implicit def showTuple[A: Show, B: Show] = Show[(A, B)] {
     case (a, b) => s"(${a.show}, ${b.show})"
   }
+  implicit def showSeq[A: Show] = Show[Seq[A]] {
+    as => as.map(_.show).mkString("Seq(", ", ", ")")
+  }
   implicit class ShowOps[A](a: A)(implicit s: Show[A]) {
     def show: String = s.show(a)
   }

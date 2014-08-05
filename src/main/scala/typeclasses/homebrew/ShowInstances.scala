@@ -25,7 +25,7 @@ object ShowInstances extends TypeClass[Show] {
         val hs = CH.show(head)
         val ts = CT.show(tail)
         val end = if (ts.isEmpty) "" else s", $ts"
-        s"$name = $hs$end"
+        s"$name: $hs$end"
     }
 
   override def emptyCoproduct: Show[CNil] =
@@ -35,7 +35,7 @@ object ShowInstances extends TypeClass[Show] {
     name: String,
     CL: => Show[L],
     CR: => Show[R]): Show[:+:[L, R]] = Show {
-    case Inl(left) => s"$name (${CL.show(left)})"
+    case Inl(left) => s"$name {${CL.show(left)}}"
     case Inr(right) => CR.show(right)
   }
 }
