@@ -1,13 +1,12 @@
-package typeclasses.homebrew
+package typeclasses.homebrew.show
 
 import shapeless._
+import typeclasses.homebrew.TypeClass
 
 /**
  * Created by eap on 7/31/14.
  */
 object ShowInstances extends TypeClass[Show] {
-  import Show._
-
   override def emptyProduct: Show[HNil] = Show { _ => "" }
 
   override def project[A, B](

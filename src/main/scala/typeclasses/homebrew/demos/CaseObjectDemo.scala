@@ -1,6 +1,6 @@
 package typeclasses.homebrew.demos
 
-import typeclasses.homebrew.{ Show, ShowInstances }
+import typeclasses.homebrew.show.{ Show, ShowInstances }
 
 /**
  * Created by eap on 8/6/14.

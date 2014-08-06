@@ -1,4 +1,4 @@
-package typeclasses.homebrew
+package typeclasses.homebrew.show
 
 /**
  * Created by eap on 7/31/14.
