@@ -6,7 +6,8 @@ object TypeClassesBuild extends Build {
   val baseDependencies = Seq(
     "com.chuusai" %% "shapeless" % "2.1.0-SNAPSHOT",
     "org.scala-lang" % "scala-library" % "2.11.2",
-    "org.scala-lang" % "scala-reflect" % "2.11.2"
+    "org.scala-lang" % "scala-reflect" % "2.11.2",
+    "io.argonaut" %% "argonaut" % "6.0.4"
   )
 
   val baseResolvers = Seq(

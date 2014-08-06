@@ -1,4 +1,4 @@
-package typeclasses.homebrew.demos
+package typeclasses.homebrew.showDemos
 
 import typeclasses.homebrew.show.{ ShowInstances, Show }
 
