@@ -10,7 +10,8 @@ object ShowInstancesDemo {
   import ShowSyntax._
 
   /*
-   There is nowhere we can stick this implicit.
+   There is nowhere we can stick this implicit such that
+   it gets used by the shapeless LabelledTypeClass[_].
    */
   implicit def injectedShow: Show[RNil] = new Show[RNil] {
     override def show(t: RNil): String = s"Injected! ${t.s}"
