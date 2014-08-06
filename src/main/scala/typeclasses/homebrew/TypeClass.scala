@@ -42,6 +42,10 @@ trait LowPriorityTypeClassConstructors[C[_]] extends TypeClassImpl[C] {
     type Inner = I
   }
 
+  type GenericAux[A, B] = Instance[A] {
+    type Inner = B
+  }
+
   implicit def emptyProductInstance[In <: HNil]: ProductAux[In, HNil] =
     new Instance[In] {
       type Inner = HNil
@@ -79,7 +83,7 @@ trait TypeClass[C[_]] extends LowPriorityTypeClassConstructors[C] {
   implicit def genericInstance[A, Repr0, Repr1](
     implicit lg: LabelledGeneric.Aux[A, Repr0],
     bg: Generic.Aux[A, Repr1],
-    instance: Instance[Repr0] { type Inner = Repr1 }): FinalInstance[A] =
+    instance: GenericAux[Repr0, Repr1]): FinalInstance[A] =
     new FinalInstance[A] {
       def apply() = project(instance(), bg.to, bg.from)
     }
