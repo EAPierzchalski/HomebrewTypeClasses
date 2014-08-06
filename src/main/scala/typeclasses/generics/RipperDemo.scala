@@ -18,7 +18,6 @@ object RipperDemo {
   def main(args: Array[String]) {
     import lazyImplicits._
     import SymbolRipper._
-    //import SymbolRipper.auto._
     def magic[A](implicit ripp: Ripper[A]): Unit = println(ripp())
     magic[A]
     magic[D]

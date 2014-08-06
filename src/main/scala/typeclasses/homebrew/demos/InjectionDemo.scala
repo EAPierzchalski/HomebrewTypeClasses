@@ -21,11 +21,15 @@ object InjectionDemo {
   def main(args: Array[String]) {
     import Show._
     import shapeless._
-    import ShowInstances._
-    import typeclasses.generics.lazyImplicits._
-    import Inject._
-    implicit val showInject = implicitly[Lazy[Show[Inject]]].value
-    println((CaseA(12): Inject).show)
-    println(CaseA(19).show)
+    import ShowInstances.auto._
+    {
+      import Inject._
+      println((CaseA(12): Inject).show)
+      println(CaseA(19).show)
+    }
+    {
+      println((CaseA(12): Inject).show)
+      println(CaseA(19).show)
+    }
   }
 }

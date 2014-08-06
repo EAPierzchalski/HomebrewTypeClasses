@@ -24,10 +24,14 @@ trait TypeClassImpl[C[_]] {
     from: B => A): C[A]
 }
 
-trait TypeClass[C[_]] extends TypeClassImpl[C] { tc =>
+trait LowPriorityTypeClassConstructors[C[_]] extends TypeClassImpl[C] {
   trait Instance[L] extends DepFn0 {
     type Inner
     final type Out = C[Inner]
+  }
+
+  trait FinalInstance[A] {
+    def apply(): C[A]
   }
 
   type ProductAux[L <: HList, I <: HList] = Instance[L] {
@@ -38,10 +42,6 @@ trait TypeClass[C[_]] extends TypeClassImpl[C] { tc =>
     type Inner = I
   }
 
-  type GenericAux[A, B] = Instance[A] {
-    type Inner = B
-  }
-
   implicit def emptyProductInstance[In <: HNil]: ProductAux[In, HNil] =
     new Instance[In] {
       type Inner = HNil
@@ -49,12 +49,12 @@ trait TypeClass[C[_]] extends TypeClassImpl[C] { tc =>
     }
 
   implicit def productInstance[Label <: Symbol, Head, Tail <: HList, TailInner <: HList](
-    implicit witness: Lazy[Witness.Aux[Label]],
-    cHead: Lazy[C[Head]],
-    tailInstance: Lazy[ProductAux[Tail, TailInner]]): ProductAux[FieldType[Label, Head] :: Tail, Head :: TailInner] =
+    implicit witness: Witness.Aux[Label],
+    cHead: C[Head],
+    tailInstance: ProductAux[Tail, TailInner]): ProductAux[FieldType[Label, Head] :: Tail, Head :: TailInner] =
     new Instance[FieldType[Label, Head]:: Tail] {
       type Inner = Head :: TailInner
-      def apply() = product(witness.value.value.name, cHead.value, tailInstance.value())
+      def apply() = product(witness.value.name, cHead, tailInstance())
     }
 
   implicit def emptyCoproductInstance[In <: CNil]: CoproductAux[In, CNil] =
@@ -64,18 +64,29 @@ trait TypeClass[C[_]] extends TypeClassImpl[C] { tc =>
     }
 
   implicit def coproductInstance[Label <: Symbol, Left, Right <: Coproduct, RightInner <: Coproduct](
-    implicit witness: Lazy[Witness.Aux[Label]],
+    implicit witness: Witness.Aux[Label],
     cLeft: Lazy[C[Left]],
-    rightInstance: Lazy[CoproductAux[Right, RightInner]]): CoproductAux[FieldType[Label, Left] :+: Right, Left :+: RightInner] =
+    rightInstance: CoproductAux[Right, RightInner]): CoproductAux[FieldType[Label, Left] :+: Right, Left :+: RightInner] =
     new Instance[FieldType[Label, Left]:+: Right] {
       type Inner = Left :+: RightInner
-      def apply() = coproduct(witness.value.value.name, cLeft.value, rightInstance.value())
+      def apply() = coproduct(witness.value.name, cLeft.value, rightInstance())
     }
 
-  implicit def genericInstance[A, Repr0, Repr1](
-    implicit lg: Lazy[LabelledGeneric.Aux[A, Repr0]],
-    bg: Lazy[Generic.Aux[A, Repr1]],
-    ripper: Lazy[GenericAux[Repr0, Repr1]]): C[A] =
-    project(ripper.value(), bg.value.to, bg.value.from)
+}
 
+trait TypeClass[C[_]] extends LowPriorityTypeClassConstructors[C] {
+
+  implicit def genericInstance[A, Repr0, Repr1](
+    implicit lg: LabelledGeneric.Aux[A, Repr0],
+    bg: Generic.Aux[A, Repr1],
+    instance: Instance[Repr0] { type Inner = Repr1 }): FinalInstance[A] =
+    new FinalInstance[A] {
+      def apply() = project(instance(), bg.to, bg.from)
+    }
+
+  object auto {
+    implicit def derive[A](implicit instance: Lazy[FinalInstance[A]]): C[A] = instance.value()
+  }
+
+  def apply[A](implicit instance: Lazy[FinalInstance[A]]): C[A] = instance.value()
 }
