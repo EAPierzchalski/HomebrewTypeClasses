@@ -2,9 +2,17 @@ package typeclasses.original
 
 import shapeless._
 
+//Generic[_] and TypeClass[_] are known to have issues with
+//sealed case class families inside of objects,
+//so we pre-empt that by moving them to the top level.
+
 sealed trait Rec
 case class RNil(s: String) extends Rec
 case class RCons(s: String, r: Rec) extends Rec
+
+sealed trait InnerRec
+case class Base(s: String) extends InnerRec
+case class ListTree(s: String, children: List[InnerRec]) extends InnerRec
 
 object ShowInstancesDemo {
   import ShowSyntax._
@@ -25,6 +33,28 @@ object ShowInstancesDemo {
 
     //but instead,
     assert(out == "RCons(s = hi, r = RCons(s = lo, r = RNil(s = end)))")
+
+    //ideally, lazy implicit resolution by the methods in Show.auto._
+    //would mean that the compiler would have no issue deriving Show[List[InnerRec]]
+    //and thus Show[InnerRec].
+    val listTree: InnerRec =
+      ListTree("top",
+        List(
+          Base("child"),
+          ListTree("treeChild",
+            List(
+              Base("grandchild"),
+              Base("otherGrandchild")
+            )
+          )
+        )
+      )
+
+    //sadly...
+    import shapeless.test.illTyped
+    illTyped {
+      """val out = listTree.show"""
+    }
   }
 }
 
@@ -41,10 +71,16 @@ trait Show[T] {
 /**
  * The below is copied from the shapeless 'Show' example
  * (found [[https://github.com/milessabin/shapeless/blob/cc3af78992cc24fe64b25d27ab2fe878948be467/examples/src/main/scala/shapeless/examples/shows.scala here]])
+ * I've added the 'listShow' to demonstrate problems when recursion is 'separated' by
+ * an intermediate container type.
  */
 object Show extends LabelledTypeClassCompanion[Show] {
   implicit def stringShow: Show[String] = new Show[String] {
     def show(t: String) = t
+  }
+
+  implicit def listShow[A](implicit showA: Show[A]): Show[List[A]] = new Show[List[A]] {
+    def show(t: List[A]) = t.map(showA.show).mkString("List(", ", ", ")")
   }
 
   implicit def showInstance: LabelledTypeClass[Show] = new LabelledTypeClass[Show] {
