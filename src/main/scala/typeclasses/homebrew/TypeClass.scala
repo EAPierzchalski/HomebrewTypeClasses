@@ -2,6 +2,7 @@ package typeclasses.homebrew
 
 import shapeless._
 import shapeless.record.FieldType
+import scala.language.higherKinds
 
 /**
  * Created by eap on 7/31/14.

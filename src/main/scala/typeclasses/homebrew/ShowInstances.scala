@@ -6,8 +6,6 @@ import shapeless._
  * Created by eap on 7/31/14.
  */
 object ShowInstances extends TypeClass[Show] {
-  import Show._
-
   override def emptyProduct: Show[HNil] = Show { _ => "" }
 
   override def project[A, B](
@@ -38,4 +36,5 @@ object ShowInstances extends TypeClass[Show] {
     case Inl(left) => s"$name {${CL.show(left)}}"
     case Inr(right) => CR.show(right)
   }
+
 }

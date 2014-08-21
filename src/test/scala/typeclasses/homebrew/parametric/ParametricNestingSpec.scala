@@ -33,7 +33,17 @@ class ParametricNestingSpec extends Specification {
     import Show._
     import ShowInstances.auto._
 
-    val nestedShow = (NSeq(Seq(S1("hi"), S1("lo"), S2(12, S1("rec")))): Nested).show
+    implicit def lzss[A](implicit lzs: Lazy[Show[A]]): Lazy[Show[Seq[A]]] = Lazy {
+      Show.showSeq(lzs.value)
+    }
+
+    import shapeless.test.illTyped
+    illTyped {
+      """
+        val nestedShow = (NSeq(Seq(S1("hi"), S1("lo"), S2(12, S1("rec")))): Nested).show
+      """
+    }
+    val nestedShow = ""
     nestedShow shouldEqual "NSeq {ss: Seq(S1 {s: hi}, S1 {s: lo}, S2 {n: 12, s: S1 {s: rec}}}})}"
   }
 }
