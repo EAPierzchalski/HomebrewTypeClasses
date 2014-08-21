@@ -31,10 +31,6 @@ trait LowPriorityTypeClassConstructors[C[_]] extends TypeClassImpl[C] {
     final type Out = C[Inner]
   }
 
-  trait FinalInstance[A] {
-    def apply(): C[A]
-  }
-
   type ProductAux[L <: HList, I <: HList] = Instance[L] {
     type Inner = I
   }
@@ -53,13 +49,13 @@ trait LowPriorityTypeClassConstructors[C[_]] extends TypeClassImpl[C] {
       def apply() = emptyProduct
     }
 
-  implicit def productInstance[Label <: Symbol, Head, Tail <: HList, TailInner <: HList](
+  implicit def productInstance[Label <: Symbol, FHead, Tail <: HList, TailInner <: HList](
     implicit witness: Witness.Aux[Label],
-    cHead: C[Head],
-    tailInstance: ProductAux[Tail, TailInner]): ProductAux[FieldType[Label, Head] :: Tail, Head :: TailInner] =
-    new Instance[FieldType[Label, Head]:: Tail] {
-      type Inner = Head :: TailInner
-      def apply() = product(witness.value.name, cHead, tailInstance())
+    cHead: Lazy[C[FHead]],
+    tailInstance: ProductAux[Tail, TailInner]): ProductAux[FieldType[Label, FHead] :: Tail, FHead :: TailInner] =
+    new Instance[FieldType[Label, FHead]:: Tail] {
+      type Inner = FHead :: TailInner
+      def apply() = product(witness.value.name, cHead.value, tailInstance())
     }
 
   implicit def emptyCoproductInstance[In <: CNil]: CoproductAux[In, CNil] =
@@ -80,15 +76,17 @@ trait LowPriorityTypeClassConstructors[C[_]] extends TypeClassImpl[C] {
   implicit def genericInstance[A, Repr0, Repr1](
     implicit lg: LabelledGeneric.Aux[A, Repr0],
     bg: Generic.Aux[A, Repr1],
-    instance: GenericAux[Repr0, Repr1]): FinalInstance[A] =
-    new FinalInstance[A] {
+    instance: GenericAux[Repr0, Repr1]): GenericAux[A, A] =
+
+    new Instance[A] {
+      type Inner = A
       def apply() = project(instance(), bg.to, bg.from)
     }
+
 }
 
 trait TypeClass[C[_]] extends LowPriorityTypeClassConstructors[C] {
-
   object auto {
-    implicit def derive[A](implicit instance: Lazy[FinalInstance[A]]): C[A] = instance.value()
+    implicit def derive[A](implicit instance: Lazy[Lazy[GenericAux[A, A]]]): C[A] = instance.value.value()
   }
 }
