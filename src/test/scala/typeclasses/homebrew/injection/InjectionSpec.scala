@@ -49,6 +49,7 @@ class InjectionSpec extends Specification {
     import shapeless._
     import ShowInstances.auto._
     import Inject._
+
     val traitShow = (CaseA(12): Inject).show
     traitShow shouldEqual "CaseA {INJECTION(12)}"
   }
@@ -58,6 +59,7 @@ class InjectionSpec extends Specification {
     import shapeless._
     import ShowInstances.auto._
     import Inject._
+
     val caseShow = CaseA(12).show
     caseShow shouldEqual "INJECTION(12)"
   }

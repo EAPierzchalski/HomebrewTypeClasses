@@ -17,7 +17,7 @@ case class RecB(d: Double, c: CorecC) extends CorecB
 
 sealed trait CorecC
 case class BaseC(s: String) extends CorecC
-case class RecC(s: String, a: CRA) extends CorecC
+case class RecC(s: String, a: CorecA) extends CorecC
 
 object NestingDemo {
   sealed trait Inside
@@ -33,7 +33,7 @@ object NestingDemo {
     import Show._
     import shapeless._
     import ShowInstances.auto._
-    println((RA(1, RB(3.14, BC("hi"))): CRA).show)
+    println((RecA(1, RecB(3.14, RecC("hi", BaseA("done")))): CorecA).show)
     println((Out(In("sup")): Outside).show)
     println(BareOut(BareIn("lol")).show)
   }
