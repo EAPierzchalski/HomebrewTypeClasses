@@ -76,10 +76,6 @@ trait LowPriorityTypeClassConstructors[C[_]] extends TypeClassImpl[C] {
       def apply() = coproduct(witness.value.name, cLeft.value, rightInstance())
     }
 
-}
-
-trait TypeClass[C[_]] extends LowPriorityTypeClassConstructors[C] {
-
   implicit def genericInstance[A, Repr0, Repr1](
     implicit lg: LabelledGeneric.Aux[A, Repr0],
     bg: Generic.Aux[A, Repr1],
@@ -87,10 +83,11 @@ trait TypeClass[C[_]] extends LowPriorityTypeClassConstructors[C] {
     new FinalInstance[A] {
       def apply() = project(instance(), bg.to, bg.from)
     }
+}
+
+trait TypeClass[C[_]] extends LowPriorityTypeClassConstructors[C] {
 
   object auto {
     implicit def derive[A](implicit instance: Lazy[FinalInstance[A]]): C[A] = instance.value()
   }
-
-  def apply[A](implicit instance: Lazy[FinalInstance[A]]): C[A] = instance.value()
 }
